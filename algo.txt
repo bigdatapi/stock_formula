@@ -1,0 +1,20 @@
+IF (NOT(SHGZG > lt1*100000000 AND SHGZG < lt2*100000000 AND CLOSE > MA(CLOSE, lt3)))
+    RETURN 0;
+
+num=CODE;
+r1=STRLEFT(num,1)=='0' OR STRLEFT(num,1)=='3'; 
+val1=(r1 AND CODETYPE=='1'); /*深证A股*/
+IF (NOT(val1))
+    RETURN 0;
+
+IF ((CLOSE <= OPEN) OR (CLOSE/REF(CLOSE,1) < 1.0372) OR ((HIGH-CLOSE)/(CLOSE-OPEN)>0.372)) 
+    RETURN 0;/* 如果不是红柱或者今日涨幅没超过3.72%或者上引线长度超过红柱长度的37.2% 都认为今天当前K线是不满足条件的 */
+
+IF (VOL/CAPITAL<=0.01 OR VOL/CAPITAL>=0.1) /* 换手率不大于1%或者换手率不小于10% */
+    RETURN 0;
+    
+xx=1-REF(CLOSE,1)/REF(CLOSE,2);
+IF (xx>0.0372 AND CLOSE>=REF(CLOSE,2)) /* 如果前一个交易日跌幅大于3.72%并且今日收盘已经收复昨日跌去的价格 */
+    RETURN 1;
+
+RETURN 0;
